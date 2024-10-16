@@ -1,0 +1,45 @@
+# @title Frequency Domain technique using Fourier Transform
+import cv2
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+def frequency_domain_enhancement(folder_path):
+    image_files = os.listdir(folder_path)
+
+    for image_name in image_files:
+        if image_name.endswith('.png') or image_name.endswith('.jpg'):
+            image_path = os.path.join(folder_path, image_name)
+
+            # Read the image using OpenCV
+            original_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+            # Perform Fourier Transform
+            f_transform = np.fft.fft2(original_image)
+            f_shift = np.fft.fftshift(f_transform)
+
+            # Apply a high-pass filter (manipulation in frequency domain)
+            rows, cols = original_image.shape
+            crow, ccol = rows // 2, cols // 2
+            f_shift[crow - 30:crow + 30, ccol - 30:ccol + 30] = 0
+
+            # Inverse Fourier Transform
+            f_ishift = np.fft.ifftshift(f_shift)
+            enhanced_image = np.fft.ifft2(f_ishift)
+            enhanced_image = np.abs(enhanced_image)
+
+            # Display the original and enhanced images
+            plt.figure(figsize=(10, 5))
+
+            plt.subplot(1, 2, 1)
+            plt.title('Original Image: ' + image_name)
+            plt.imshow(original_image, cmap='gray')
+            plt.axis('off')
+
+            plt.subplot(1, 2, 2)
+            plt.title('Enhanced Image (Frequency Domain): ' + image_name)
+            plt.imshow(enhanced_image, cmap='gray')
+            plt.axis('off')
+
+            plt.tight_layout()
+            plt.show()
