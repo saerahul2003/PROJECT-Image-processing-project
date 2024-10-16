@@ -1,0 +1,39 @@
+# @title Contrast Stretching
+import cv2
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+def contrast_stretching_images_in_folder(folder_path):
+    image_files = os.listdir(folder_path)
+
+    for image_name in image_files:
+        if image_name.endswith('.png') or image_name.endswith('.jpg'):
+            image_path = os.path.join(folder_path, image_name)
+
+            # Read the image using OpenCV
+            original_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+            # Calculate the minimum and maximum pixel values
+            min_val = np.min(original_image)
+            max_val = np.max(original_image)
+
+            # Apply contrast stretching
+            contrast_stretched_image = ((original_image - min_val) / (max_val - min_val)) * 255
+            contrast_stretched_image = np.uint8(contrast_stretched_image)
+
+            # Display the original and contrast-stretched images
+            plt.figure(figsize=(10, 5))
+
+            plt.subplot(1, 2, 1)
+            plt.title('Original Image: ' + image_name)
+            plt.imshow(original_image, cmap='gray')
+            plt.axis('off')
+
+            plt.subplot(1, 2, 2)
+            plt.title('Contrast-Stretched Image: ' + image_name)
+            plt.imshow(contrast_stretched_image, cmap='gray')
+            plt.axis('off')
+
+            plt.tight_layout()
+            plt.show()
