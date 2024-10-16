@@ -1,0 +1,44 @@
+# @title Global Thresholding using Otsu's Method
+import cv2
+import os
+import matplotlib.pyplot as plt
+
+def enhance_and_segment_images_go(folder_path):
+    # Get a list of all image files in the folder
+    image_files = [f for f in os.listdir(folder_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
+
+    # Loop through each image in the folder
+    for filename in image_files:
+        # Construct the full path to the image
+        image_path = os.path.join(folder_path, filename)
+
+        # Read the image using OpenCV
+        original_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+        # Apply histogram equalization for enhancement
+        enhanced_image = cv2.equalizeHist(original_image)
+
+        # Display the original and enhanced images
+        plt.figure(figsize=(10, 5))
+
+        plt.subplot(1, 3, 1)
+        plt.title('Original Image: ' + filename)
+
+        plt.imshow(original_image, cmap='gray')
+        plt.axis('off')
+
+        plt.subplot(1, 3, 2)
+        plt.title('Enhanced Image (Histogram Equalization)')
+        plt.imshow(enhanced_image, cmap='gray')
+        plt.axis('off')
+
+        # Apply global thresholding for segmentation
+        _, thresholded = cv2.threshold(enhanced_image, 127, 255, cv2.THRESH_BINARY)
+
+        plt.subplot(1, 3, 3)
+        plt.title('Segmented Image (Global Thresholding)')
+        plt.imshow(thresholded, cmap='gray')
+        plt.axis('off')
+
+        plt.tight_layout()
+        plt.show()
