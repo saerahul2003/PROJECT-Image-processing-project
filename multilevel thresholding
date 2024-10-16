@@ -1,0 +1,51 @@
+# @title MultiLevel Thresholding
+import cv2
+import os
+import matplotlib.pyplot as plt
+
+def enhance_and_segment_images_mt(folder_path):
+    # Get a list of all image files in the folder
+    image_files = [f for f in os.listdir(folder_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
+
+    # Loop through each image in the folder
+    for filename in image_files:
+        # Construct the full path to the image
+        image_path = os.path.join(folder_path, filename)
+
+        # Read the image using OpenCV
+        original_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+        # Apply histogram equalization for enhancement
+        enhanced_image = cv2.equalizeHist(original_image)
+
+        # Display the original and enhanced images
+        plt.figure(figsize=(15, 5))
+
+        plt.subplot(1, 4, 1)
+        plt.title('Original Image' + filename)
+        plt.imshow(original_image, cmap='gray')
+        plt.axis('off')
+
+        plt.subplot(1, 4, 2)
+        plt.title('Enhanced Image (Histogram Equalization)')
+        plt.imshow(enhanced_image, cmap='gray')
+        plt.axis('off')
+
+        # Apply multi-level thresholding for segmentation
+        _, thresholded1 = cv2.threshold(enhanced_image, 100, 255, cv2.THRESH_BINARY)
+        _, thresholded2 = cv2.threshold(enhanced_image, 150, 255, cv2.THRESH_BINARY)
+        _, thresholded3 = cv2.threshold(enhanced_image, 200, 255, cv2.THRESH_BINARY)
+
+        combined_thresholded = cv2.bitwise_or(thresholded1, cv2.bitwise_or(thresholded2, thresholded3))
+
+        plt.subplot(1, 4, 3)
+        plt.title('Segmented Image (Multi-level Thresholding)')
+        plt.imshow(combined_thresholded, cmap='gray')
+        plt.axis('off')
+
+        plt.tight_layout()
+        plt.show()
+
+        # Save the segmented image
+        #output_path = os.path.join(folder_path, 'segmented_multilevel_' + filename)
+        #cv2.imwrite(output_path, combined_thresholded)
